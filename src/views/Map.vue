@@ -8,10 +8,11 @@
            @update:center="centerUpdated"
            @update:bounds="boundsUpdated"
            class="map-box-view"
+           :options="{attributionControl: false}"
     >
 
       <layer-control ref="cl" position="topright"></layer-control>
-<!--      <l-control-layers ref="cl" position="topright"></l-control-layers>-->
+      <!--      <l-control-layers ref="cl" position="topright"></l-control-layers>-->
       <l-control-scale position="topright" :imperial="true" :metric="false"></l-control-scale>
 
       <l-tile-layer
@@ -40,8 +41,6 @@ import { LMap, LTileLayer, LControlLayers, LControlScale } from 'vue2-leaflet'
 import FullScreen from '@/components/Base/VFullScreen'
 import Search from '@/components/wrapped/Search'
 import Locate from '@/components/wrapped/Locate'
-// import '@geoman-io/leaflet-geoman-free'
-// import '@geoman-io/leaflet-geoman-free/dist/leaflet-geoman.css'
 import VChineseLayer from '@/components/Base/VChineseLayer'
 import LayerControl from '@/components/wrapped/LayerControl'
 import MiniMap from '@/components/wrapped/MiniMap'
@@ -53,7 +52,7 @@ export default {
     LMap,
     LTileLayer,
     'v-l-fullscreen': FullScreen,
-    "v-l-search": Search,
+    'v-l-search': Search,
     'v-l-locate': Locate,
     VChineseLayer,
     LControlLayers,
@@ -71,16 +70,12 @@ export default {
         {
           name: 'OpenStreetMap',
           visible: true,
-          attribution:
-            '&copy; <a target="_blank" href="http://osm.org/copyright">OpenStreetMap</a> contributors',
           url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
         },
         {
           name: 'OpenTopoMap',
           visible: false,
           url: 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',
-          attribution:
-            'Map data: &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>, <a href="http://viewfinderpanoramas.org">SRTM</a> | Map style: &copy; <a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)',
         }]
     }
   },
