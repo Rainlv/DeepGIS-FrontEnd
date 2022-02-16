@@ -10,7 +10,7 @@ export default {
       default () {
         return {
           provider: new OpenStreetMapProvider(),
-          style: 'bar',
+          style: '',
           notFoundMessage: 'Sorry, that address could not be found.',
         }
       }

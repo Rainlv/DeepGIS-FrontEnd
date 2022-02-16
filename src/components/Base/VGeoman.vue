@@ -20,9 +20,10 @@ export default {
   },
   mounted () {
     this.parentContainer = findRealParent(this.$parent)
-    this.pm = this.parentContainer.mapObject.pm
+    this._map = this.parentContainer.mapObject
+    this.pm = this._map.pm
     this.pm.addControls(this.options)
-    this.pm.setLang('zh');
+    this.pm.setLang('zh')
   }
 }
 </script>

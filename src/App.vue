@@ -1,13 +1,11 @@
 <template>
-  <div>
-    <v-l-map>
-    </v-l-map>
-  </div>
+  <router-view></router-view>
 </template>
 
 <script>
 import Map from '@/views/Map'
 import { Icon } from 'leaflet'
+
 
 export default {
   name: 'App',
@@ -24,6 +22,6 @@ export default {
       iconUrl: require('leaflet/dist/images/marker-icon.png'),
       shadowUrl: require('leaflet/dist/images/marker-shadow.png'),
     })
-  }
+  },
 }
 </script>

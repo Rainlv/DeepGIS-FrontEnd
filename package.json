@@ -9,13 +9,24 @@
   },
   "dependencies": {
     "@geoman-io/leaflet-geoman-free": "^2.11.4",
+    "@xunlei/vue-context-menu": "^1.0.2",
+    "axios": "^0.25.0",
     "core-js": "^3.6.5",
     "element-ui": "^2.15.6",
     "leaflet": "^1.7.1",
+    "leaflet-easybutton": "^2.4.0",
     "leaflet-geosearch": "^3.6.0",
+    "leaflet-measure": "^3.1.0",
     "leaflet-minimap": "^3.6.1",
+    "leaflet-sidebar": "^0.2.4",
+    "leaflet-sidebar-v2": "^3.2.3",
     "leaflet-wfst": "^2.0.1-beta.27",
     "leaflet.chinatmsproviders": "^3.0.4",
+    "leaflet.coordinates": "^0.1.5",
+    "leaflet.markercluster": "^1.5.3",
+    "node-sass": "^4.14.1",
+    "qs": "^6.10.3",
+    "v-contextmenu": "^2.9.0",
     "vue": "^2.6.11",
     "vue-leaflet-minimap": "^1.0.8",
     "vue-router": "^3.2.0",
@@ -40,6 +51,8 @@
     "eslint-plugin-promise": "^4.2.1",
     "eslint-plugin-standard": "^4.0.0",
     "eslint-plugin-vue": "^6.2.2",
+    "node-sass": "^4.14.1",
+    "sass-loader": "^7.3.1",
     "vue-template-compiler": "^2.6.11"
   }
 }
