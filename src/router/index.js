@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import store from '../store/index'
+import { retina } from 'leaflet/src/core/Browser'
 
 Vue.use(VueRouter)
 
@@ -9,7 +10,7 @@ const routes = [
     name: 'login',
     path: '/login',
     component: () => import('@/views/login/index'),
-    meta: {}
+    meta: {},
   },
   {
     name: 'index',
@@ -18,7 +19,13 @@ const routes = [
     meta: {
       needLogin: true
     }
-  }
+  },
+  {
+    name: 'register',
+    path: '/register',
+    component: () => import('@/views/register/index'),
+    meta: {}
+  },
 ]
 
 const router = new VueRouter({

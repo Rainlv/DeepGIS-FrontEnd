@@ -27,12 +27,6 @@ export default {
       }
     }
   },
-  mounted () {
-    // TODO 动态标记
-    // 标记编辑激活图层
-    // this.setActiveEditLayer({ layer: this.mapObject })
-    // this._map.pm.setGlobalOptions({ layerGroup: this.mapObject })
-  }
 }
 </script>
 

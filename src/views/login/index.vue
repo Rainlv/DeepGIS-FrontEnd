@@ -7,11 +7,18 @@
     </el-form-item>
 
     <el-form-item>
-      <el-input type="password" v-model="loginForm.password" auto-complete="off" placeholder="请输入密码"></el-input>
+      <el-input type="password" v-model="loginForm.password" auto-complete="off" placeholder="请输入密码"
+                @keyup.enter.native="login"></el-input>
     </el-form-item>
 
     <el-form-item style="width: 100%">
-      <el-button type="primary" style="width: 100%;background: #505458;border: none" @click="login">登录</el-button>
+      <el-button type="primary" style="width: 100%;background: #505458;border: none" @click="login" :loading="loading"
+                 :disabled="loading">登录
+      </el-button>
+
+      <el-row type="flex" justify="end">
+        <el-link type="info" @click="toRegister">没有账号？前往注册</el-link>
+      </el-row>
     </el-form-item>
   </el-form>
   </body>
@@ -31,23 +38,28 @@ export default {
         username: '',
         password: ''
       },
-      responseResult: []
+      responseResult: [],
+      loading: false
     }
   },
   methods: {
     ...mapMutations(['setUserInfo', 'setToken']),
     login () {
+      if (this.loading) return
+      this.loading = true
       auth_login(this.loginForm).then((res) => {
+        this.loading = false
         this.setToken({
           access_token: res.access_token,
           token_type: res.token_type
         })
-        if (this.$route.query.redirect){
+        if (this.$route.query.redirect) {
           this.$router.push(this.$route.query.redirect)
-        }else {
-          this.$router.push("/")
+        } else {
+          this.$router.push('/')
         }
       }).catch(() => {
+        this.loading = false
         this.$message({
           message: '登录失败！账号或密码错误',
           type: 'error'
@@ -57,14 +69,11 @@ export default {
     },
     reset () {
       this.$set(this.loginForm, 'password', '')
+    },
+    toRegister(){
+      this.$router.push('/register')
     }
   },
-  // beforeRouteLeave (to, from, next) {
-  //   user_info().then(res => {
-  //     this.setUserInfo({ userInfo: res })
-  //     next()
-  //   })
-  // }
 
 }
 </script>

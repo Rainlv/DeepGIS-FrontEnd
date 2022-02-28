@@ -41,7 +41,7 @@ export default {
       crs: L.CRS.EPSG4326,
       bubblingMouseEvents: false,
       style: {
-        color: 'black',
+        color: '#000000',
         weight: 1,
         fillColor: this.fillColor
       },
@@ -50,7 +50,6 @@ export default {
     const gmlTypeList = ['Point', 'Line', 'Polygon']
     geoserver_get_feature_type(layerName).then(res => {
       // 获取图层类型和GML字段
-      console.log(res)
       for (let field of res.featureTypes[0].properties) {
         if (field.type.startsWith('gml:')) {
           defaultOptions.geometryField = field.name
@@ -102,48 +101,8 @@ export default {
         })
         this.show()
       })
-      let sideBar = this.$store.state.globalMapObj.sideBarObj
-
-      // 图层中要素点击事件
-      let styleFlag = false
-      this.mapObject.on('click', (e) => {
-        // 编辑状态，阻止点击事件
-        if (this.isEditing()) {
-          return
-        }
-        styleFlag = !!e.layer.setStyle
-        if (this.clickFeatureElm === e.layer) {
-          styleFlag && this.clickFeatureElm.setStyle({ fillColor: this.fillColor })
-          sideBar.close()
-          this.setClickFeatureElm({ feature: null })
-        } else {
-          // 切换点击要素
-          this.setClickFeatureLayer({ feature: this.mapObject })
-          this.clickFeatureElm && this.clickFeatureElm.setStyle && this.clickFeatureElm.setStyle({ fillColor: this.fillColor })
-          styleFlag && e.layer.setStyle({
-            fillColor: this.activeColor
-          })
-          this.setClickFeatureElm({ feature: e.layer })
-
-          if (this.mapObject === this.activeEditLayer) {
-            this.setActiveEditFeature({
-              feature: e.layer
-            })
-          }
-          let props = e.layer.feature.properties
-          // 没有属性的要素(新添加的未赋值要素)用图层字段来赋空值
-          if (Object.keys(props).length === 0) {
-            for (let key in e.target.readFormat.featureType.fieldTypes) {
-              props[key] = null
-            }
-          }
-          this.setClickFeatureInfo({
-            fid: e.layer.feature.id,
-            props: props
-          })
-          sideBar.open('featureProps')
-        }
-      })
+      // // 图层中要素点击事件
+      this.mapObject.on('click', this.handleFeatureClick)
       this.mapObject.on('save:success', (e) => {
         this.$message({
           message: `${this.options.typeNS}:${this.options.typeName}保存成功`,
@@ -177,7 +136,7 @@ export default {
       'setActiveEditFeature',
       'setClickFeatureLayer',
       'addLayerObj',
-      'setClickFeatureElm'
+      'setClickFeatureElm',
     ]),
     show () {
       this.mapObject.addTo(this._map)
@@ -212,10 +171,74 @@ export default {
       return '#' + str.substring(str.length - 6, str.length)
     },
     bringToFront () {
+      if (this.gmlType === 'Point') {
+        this.$message({
+          message: '点图层默认置顶，无法修改',
+          type: 'warning'
+        })
+        return
+      }
       this.mapObject.eachLayer((layer) => {
         layer.bringToFront()
       })
+    },
+    bringToBack () {
+      if (this.gmlType === 'Point') {
+        this.$message({
+          message: '点图层默认置顶，无法修改',
+          type: 'warning'
+        })
+        return
+      }
+      this.mapObject.eachLayer((layer) => {
+        layer.bringToBack()
+      })
+    },
+    //图层点击事件
+    handleFeatureClick (e) {
+      let sideBar = this.$store.state.globalMapObj.sideBarObj
+      let styleFlag = false
+      // 编辑状态，阻止点击事件
+      if (this.isEditing()) {
+        return
+      }
+      styleFlag = !!e.layer.setStyle
+      let originalStyle = { ...e.layer.options }
+      if (this.clickFeatureElm === e.layer) {
+        styleFlag && this.clickFeatureElm.setStyle({ fillColor: this.reverseColor(e.layer.options.fillColor) })
+        // styleFlag && this.clickFeatureElm.setStyle({ fillColor: originalStyle.fillColor })
+        // sideBar.close()
+        this.setClickFeatureElm({ feature: null })
+      } else {
+        // 切换点击要素
+        this.setClickFeatureLayer({ feature: this.mapObject })
+        this.clickFeatureElm && this.clickFeatureElm.setStyle && this.clickFeatureElm.setStyle({ fillColor: this.reverseColor(this.clickFeatureElm.options.fillColor) })
+        styleFlag && e.layer.setStyle({
+          fillColor: this.reverseColor(e.layer.options.fillColor)
+        })
+        this.setClickFeatureElm({ feature: e.layer })
+
+        if (this.mapObject === this.activeEditLayer) {
+          this.setActiveEditFeature({
+            feature: e.layer
+          })
+        }
+        let props = e.layer.feature.properties
+        // 没有属性的要素(新添加的未赋值要素)用图层字段来赋空值
+        if (Object.keys(props).length === 0) {
+          for (let key in e.target.readFormat.featureType.fieldTypes) {
+            props[key] = null
+          }
+        }
+        this.setClickFeatureInfo({
+          fid: e.layer.feature.id,
+          props: props
+        })
+        // sideBar.open('featureProps')
+      }
+
     }
+
   },
   watch: {
     fillColor (newVal, _) {

@@ -27,7 +27,6 @@ export default {
   },
   props,
   mounted () {
-    console.log(this)
     this.layer = this.$refs.layer
     this.addWMSLayerObj({
       layerName: this.options.layers,
@@ -39,6 +38,7 @@ export default {
     getWMSLayer () {
       const defaultOptions = {
         format: 'image/png',
+        transparent: true
       }
       return L.tileLayer.wms(baseGeoserverUrl, {
         ...defaultOptions,

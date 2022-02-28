@@ -17,6 +17,9 @@
       <contextmenu-item @click="handleSetEditClick">{{ editStatus ? '取消编辑' : '设为编辑图层' }}</contextmenu-item>
       <contextmenu-item @click="handleZoomTo">缩放至图层</contextmenu-item>
       <contextmenu-item @click="handleRemoveLayer">删除图层</contextmenu-item>
+      <contextmenu-item @click="handleBring2Top">置于顶层</contextmenu-item>
+      <contextmenu-item @click="handleBring2Back">置于底层</contextmenu-item>
+      <contextmenu-item @click="showStyleForm">样式设置</contextmenu-item>
       <contextmenu-submenu title="子菜单">
         <contextmenu-item>菜单4</contextmenu-item>
         <contextmenu-item divider></contextmenu-item>
@@ -37,6 +40,7 @@
         <el-button size="small" icon="el-icon-refresh" circle @click="initAssertTree"></el-button>
       </el-col>
     </el-row>
+<!--    TODO: Lazy Load-->
     <el-tree
       class="filter-tree"
       :data="data"
@@ -71,6 +75,7 @@
         </span>
       </span>
     </el-tree>
+    <layer-style-form ref="styleForm"></layer-style-form>
   </div>
 </template>
 
@@ -85,11 +90,12 @@ import {
   ContextmenuSubmenu,
   ContextmenuGroup,
 } from 'v-contextmenu/src'
-// import '@/assets/icon/iconfont.css'
+import LayerStyleForm from '@/components/LayerStyleForm'
 
 export default {
   name: 'LayerTree',
   components: {
+    LayerStyleForm,
     Contextmenu,
     ContextmenuItem,
     ContextmenuSubmenu,
@@ -140,6 +146,11 @@ export default {
       'addWMSShowLayer'
     ]),
     ...mapActions(['setActiveEditLayer']),
+    showStyleForm(){
+      let idx = this._getLayerIndexByID(this.contextNode.data.id)
+      let activeLayer = this.showLayers[idx].layerObj.mapObject
+      this.$refs.styleForm.showStyleForm(activeLayer)
+    },
     // 右键菜单
     filterNode (value, data) {
       if (!value) return true
@@ -195,7 +206,7 @@ export default {
     checkChange (nodeData, treeStatus) {
       let idx = this._getLayerIndexByID(nodeData.id)
       if (treeStatus.checkedKeys.indexOf(nodeData.id) !== -1) {
-        this.showLayers[idx].layerObj.fillColor = nodeData.color
+        nodeData.color = this.showLayers[idx].layerObj.fillColor
         this.showLayers[idx].layerObj.show()
       } else {
         this.showLayers[idx].layerObj.hide()
@@ -226,6 +237,16 @@ export default {
       let idx = this._getLayerIndexByID(this.contextNode.data.id)
       let activeLayerVComp = this.showLayers[idx].layerObj
       activeLayerVComp.fitBounds()
+    },
+    handleBring2Top(){
+      let idx = this._getLayerIndexByID(this.contextNode.data.id)
+      let activeLayerVComp = this.showLayers[idx].layerObj
+      activeLayerVComp.bringToFront()
+    },
+    handleBring2Back(){
+      let idx = this._getLayerIndexByID(this.contextNode.data.id)
+      let activeLayerVComp = this.showLayers[idx].layerObj
+      activeLayerVComp.bringToBack()
     },
     handleRemoveLayer () {
       let idx = this._getLayerIndexByID(this.contextNode.data.id)

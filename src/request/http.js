@@ -13,9 +13,8 @@ const headerFormData = {
 
 const axios_instance = axios.create({
   timeout: 10000, // 请求超时时间
-  baseURL: 'http://localhost:8010',
+  baseURL: process.env.VUE_APP_BASE_API,
   headers: headerJSON,
-  // withCredentials: true
 })
 // 请求拦截器
 axios_instance.interceptors.request.use(
@@ -33,7 +32,7 @@ axios_instance.interceptors.request.use(
 // 响应拦截器
 axios_instance.interceptors.response.use(
   response => {
-    if (response.status === 200) {
+    if (response.status >= 200 && response.status < 300) {
       return Promise.resolve(response)
     } else {
       return Promise.reject(response)

@@ -2,15 +2,15 @@ import Vue from 'vue'
 
 export const editLayer = {
   state: () => ({
-    activeEditLayer: null,
-    activeEditFeature: null,
+    activeEditLayer: null,  // 当前编辑图层
+    activeEditFeature: null,  // 当前编辑要素
 
     clickFeatureInfo: {
       fid: null,
       props: {}
-    },
-    clickFeatureLayer: null,
-    clickFeatureElm: null
+    },  // 点击图层的信息
+    clickFeatureLayer: null,  // 点击图层
+    clickFeatureElm: null,  // 点击要素
   }),
   mutations: {
     setClickFeatureElm (state, { feature }) {
@@ -47,7 +47,7 @@ export const editLayer = {
     },
     setClickFeatureLayer (state, { feature }) {
       Vue.set(state, 'clickFeatureLayer', feature)
-    }
+    },
   },
   actions: {
     setActiveEditLayer ({

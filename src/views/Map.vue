@@ -3,6 +3,7 @@
     <l-map ref="map"
            :zoom="zoom"
            :center="center"
+           :minZoom="2"
            @update:zoom="zoomUpdated"
            @update:center="centerUpdated"
            @update:bounds="boundsUpdated"
@@ -149,7 +150,16 @@ export default {
         })
       }
     },
-    warnNoEditingLayer(e){
+    warnNoDrawingLayer (e) {
+      if (!this.activeEditLayer) {
+        this.$message({
+          message: '当前编辑图层未设置,绘图结果可能无法保存！',
+          type: 'warning'
+        })
+      }
+    },
+    warnNoEditingLayer (e) {
+      if (!e.enabled) return
       if (!this.activeEditLayer) {
         this.$message({
           message: '当前编辑图层未设置,绘图结果可能无法保存！',
@@ -160,9 +170,11 @@ export default {
   },
   mounted () {
     this.setMap({ map: this.$refs.map.mapObject })
-    this.$refs.map.mapObject.on('pm:drawstart', this.warnNoEditingLayer)
-    // this.$refs.map.mapObject.on('pm:drawstart', this.warnNoEditingLayer)
-    // this.$refs.map.mapObject.on('pm:drawstart', this.warnNoEditingLayer)
+    this.$refs.map.mapObject.on('pm:globalremovalmodetoggled', this.warnNoEditingLayer)
+    this.$refs.map.mapObject.on('pm:globaldragmodetoggled', this.warnNoEditingLayer)
+    this.$refs.map.mapObject.on('pm:globalrotatemodetoggled', this.warnNoEditingLayer)
+    this.$refs.map.mapObject.on('pm:globaleditmodetoggled', this.warnNoEditingLayer)
+    this.$refs.map.mapObject.on('pm:drawstart', this.warnNoDrawingLayer)
     // TODO　添加MarkerCluster
     // this.$refs.map.mapObject.on('pm:create', (e) => {
     //   e.shape === "Marker" && this.makerClusterObj.addLayer(e.layer)
