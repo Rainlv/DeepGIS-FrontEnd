@@ -78,7 +78,7 @@ export default {
           fillColor: this.reverseColor(newVal.fillColor),
           fillOpacity: newVal.fillTransparency / 100
         }
-        this.clickFeature.setStyle(styleObj)
+        this.clickFeature.setStyle && this.clickFeature.setStyle(styleObj)
       },
       deep: true
     },
@@ -88,6 +88,7 @@ export default {
   },
   methods: {
     reverseColor (oldColor) {
+      if (!oldColor) return
       oldColor = '0x' + oldColor.replace(/#/g, '')
       let str = '000000' + (0xFFFFFF - oldColor).toString(16)
       return '#' + str.substring(str.length - 6, str.length)

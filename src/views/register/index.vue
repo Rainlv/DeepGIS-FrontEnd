@@ -1,20 +1,20 @@
 <template>
   <body id="poster">
-  <el-form class="login-container" label-position="left" label-width="0px">
+  <el-form :model="registerForm" class="login-container" label-position="left" label-width="0px" :rules="rules">
     <h3 class="login_title">注册</h3>
-    <el-form-item>
+    <el-form-item prop="nick_name">
       <el-input type="text" v-model="registerForm.nick_name" auto-complete="off" placeholder="请输入昵称"></el-input>
     </el-form-item>
 
-    <el-form-item>
+    <el-form-item prop="email">
       <el-input type="text" v-model="registerForm.email" auto-complete="off" placeholder="请输入账号"></el-input>
     </el-form-item>
 
-    <el-form-item>
+    <el-form-item prop="password">
       <el-input type="password" v-model="registerForm.password" auto-complete="off" placeholder="请输入密码"></el-input>
     </el-form-item>
 
-    <el-form-item>
+    <el-form-item prop="confirmPwd">
       <el-input type="password" v-model="registerContext.confirmPwd" auto-complete="off" placeholder="确认密码"
                 @keyup.enter.native="register">
       </el-input>
@@ -37,10 +37,40 @@
 
 <script>
 import { auth_register } from '@/request/api'
+import { isValidNickname } from '@/utils/validator'
 
 export default {
   name: 'index',
   data () {
+    const validateNickname = (rule, value, callback) => {
+      if (!value) {
+        callback(new Error('昵称不能为空'))
+      } else if (value.toString().length < 3 || value.toString().length > 18) {
+        callback(new Error('昵称长度为3 - 18个字符'))
+      } else if (!isValidNickname(value)) {
+        callback(new Error('昵称以字母开头 长度在3~18之间 只能包含字母、数字和下划线'))
+      } else {
+        callback()
+      }
+    }
+    const validatePassword = (rule, value, callback) => {
+      if (!value) {
+        callback(new Error('密码不能为空'))
+      } else if (value.toString().length < 6 || value.toString().length > 18) {
+        callback(new Error('密码长度为6 - 18个字符'))
+      } else {
+        callback()
+      }
+    }
+    const validateConfirmPassword = (rule, value, callback) => {
+      if (!value) {
+        callback(new Error('请再次输入密码'))
+      } else if (value !== this.registerForm.password) {
+        callback(new Error('两次输入密码不一致!'))
+      } else {
+        callback()
+      }
+    }
     return {
       registerForm: {
         nick_name: '',
@@ -51,7 +81,34 @@ export default {
         confirmPwd: '',
       },
       responseResult: [],
-      loading: false
+      loading: false,
+      rules: {
+        nick_name: [{
+          required: true,
+          validator: validateNickname,
+          trigger: 'blur'
+        }, {}],
+        email: [{
+          required: true,
+          message: '请输入邮箱地址',
+          trigger: 'blur'
+        },
+          {
+            type: 'email',
+            message: '请输入正确的邮箱地址',
+            trigger: ['blur', 'change']
+          }],
+        password: [{
+          required: true,
+          validator: validatePassword,
+          trigger: 'blur'
+        }],
+        confirmPwd: [{
+          required: true,
+          validator: validateConfirmPassword,
+          trigger: 'blur',
+        }],
+      },
     }
   },
   methods: {

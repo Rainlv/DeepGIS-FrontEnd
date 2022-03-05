@@ -1,11 +1,12 @@
 <template>
-  <el-dialog title="创建矢量图层" :visible.sync="dialogFormVisible"
-             :close-on-click-modal="false"
-             v-loading="loading"
-  >
-    <el-form :model="form"
-    >
-      <el-form-item label="矢量图层名称" :label-width="formLabelWidth">
+  <el-dialog
+    title="创建矢量图层"
+    :visible.sync="dialogFormVisible"
+    :close-on-click-modal="false"
+    append-to-body
+    v-loading="loading">
+    <el-form :model="form" :rules="rules">
+      <el-form-item label="矢量图层名称" :label-width="formLabelWidth" prop="layer_name">
         <el-input v-model="form.layer_name" autocomplete="off" placeholder="请输入图层名称"></el-input>
       </el-form-item>
       <el-form-item label="矢量类型" :label-width="formLabelWidth">
@@ -21,6 +22,7 @@
         v-for="(field, index) in form.fields"
         :label="'字段' + (index+1)"
         :key="field.key"
+        prop="fields"
       >
         <el-col :span="8">
           <el-input v-model="form.fields[index].field_name" autocomplete="off" placeholder="请输入字段名称"></el-input>
@@ -45,10 +47,22 @@
 
 <script>
 import { geoserver_create_table } from '@/request/api'
+import { isValidLayerName } from '@/utils/validator'
 
 export default {
   name: 'CreateLayer',
   data () {
+    const validateName = (rule, value, callback) => {
+      if (!value) {
+        callback(new Error('名称不能为空'))
+      } else if (value.toString().length > 18) {
+        callback(new Error('长度应小于18个字符'))
+      } else if (!isValidLayerName(value)) {
+        callback(new Error('应以字母开头，且只能包含字母、数字和下划线'))
+      } else {
+        callback()
+      }
+    }
     return {
       loading: false,
       dialogFormVisible: false,
@@ -57,7 +71,19 @@ export default {
         geo_type: '',
         fields: []
       },
-      formLabelWidth: '120px'
+      formLabelWidth: '120px',
+      rules: {
+        layer_name: [{
+          required: true,
+          validator: validateName,
+          trigger: 'blur'
+        }],
+        fields: [{
+          required: true,
+          message: "字段名称不能为空",
+          trigger: 'blur'
+        }],
+      }
     }
   },
   methods: {
@@ -96,8 +122,6 @@ export default {
         this.loading = false
         this.$alert(`创建图层失败!${res.message}`, '执行失败', { showCancelButton: false })
       })
-      // this.loading = false
-      // this.dialogFormVisible = false
     },
     removeField (key) {
       this.form.fields.forEach(function (item, index, arr) {

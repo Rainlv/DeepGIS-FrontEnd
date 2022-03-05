@@ -1,12 +1,15 @@
-import { get, post } from './http'
+import { del, download, get, post } from './http'
 import { baseGeoserverUrl } from '@/config'
-import fa from 'element-ui/src/locale/lang/fa'
 
 // 后端请求
 // ------------------
+// 地图相关
 export const geoserver_create_table = p => post('/api/geoserver/create_table', p)
 export const geoserver_get_user_feature_list = p => get('/api/geoserver/get_user_features', p)
+export const geoserver_delete_asset = p => del('/api/geoserver/delete_asset', p)
+export const geoserver_download_asset = p => download('/api/geoserver/download_features', p)
 
+// 用户
 export const auth_login = p => post('/auth/jwt/login', p, false)
 export const auth_register = p => post('/auth/register', p, true)
 export const user_info = () => get('users/me', null)

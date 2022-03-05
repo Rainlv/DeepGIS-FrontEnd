@@ -3,7 +3,7 @@
 </template>
 
 <script>
-import Map from '@/views/Map'
+import Map from '@/views/map/index'
 import { Icon } from 'leaflet'
 
 

@@ -30,6 +30,7 @@
       <mini-map/>
       <mouse-coordinate/>
       <create-layer-button></create-layer-button>
+      <upload-layer-btn></upload-layer-btn>
       <WFSLayer
         v-for="wfsLayer in wfsLayers"
         :key="wfsLayer.typeNS + ':' + wfsLayer.typeName"
@@ -67,9 +68,11 @@ import VWMSLayer from '@/components/Base/VWMSLayer'
 import { editLayer, globalMapObj, showLayer, showWMSLayer } from '@/store/modules/map'
 import { mapMutations, mapState } from 'vuex'
 import VMakerCluster from '@/components/Base/VMakerCluster'
+import UploadLayerBtn from '@/views/map/components/UploadLayerBtn'
 
 export default {
   components: {
+    UploadLayerBtn,
     VMakerCluster,
     VWMSLayer,
     SideBar,

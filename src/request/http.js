@@ -96,7 +96,7 @@ axios_instance.interceptors.response.use(
 )
 
 /**
- * get方法，对应get请求（携带Cookies）
+ * get方法，对应get请求
  * @param {String} url [请求的url地址]
  * @param {Object} params [请求时携带的参数]
  * @param {Object} config [请求配置]
@@ -137,23 +137,55 @@ export function post (url, params, json = true, config = {}) {
   })
 }
 
-// /**
-//  * post方法，对应post请求,请求体为form-urlencoded
-//  * @param {String} url [请求的url地址]
-//  * @param {Object} params [请求时携带的参数]
-//  */
-// export function post_form (url, params, config) {
-//   return new Promise((resolve, reject) => {
-//     axios_instance.post(url, QS.stringify(params), {
-//       headers: {
-//         'Content-Type': 'application/x-www-form-urlencoded'
-//       }
-//     })
-//       .then(res => {
-//         resolve(res.data)
-//       })
-//       .catch(err => {
-//         reject(err.data)
-//       })
-//   })
-// }
+/**
+ * delete，对应delete请求
+ * @param {String} url [请求的url地址]
+ * @param {Object} params [请求时携带的参数]
+ * @param {Object} config [请求配置]
+ */
+export function del (url, params, config = {}) {
+  return new Promise((resolve, reject) => {
+    axios_instance.delete(url, {
+      params: params,
+      ...config
+    })
+      .then(res => {
+        resolve(res.data)
+      })
+      .catch(err => {
+        reject(err.data)
+      })
+  })
+}
+
+export function download (url, params, config) {
+  axios_instance.get(url, {
+    params: params,
+    responseType: 'blob',
+    ...config
+  })
+    .then(res => {
+      const {
+        data,
+        headers
+      } = res
+      // let timestamp = new Date().getTime()
+      // const fileName = `${timestamp}.geojson`
+      const fileName = headers['content-disposition'].replace(/\w+;filename=(.*)/, '$1')
+
+      const blob = new Blob([data], { type: headers['content-type'] })
+      // const blob = new Blob([data])
+      let dom = document.createElement('a')
+      let url = window.URL.createObjectURL(blob)
+      dom.href = url
+      dom.download = decodeURI(fileName)
+      dom.style.display = 'none'
+      document.body.appendChild(dom)
+      dom.click()
+      dom.parentNode.removeChild(dom)
+      window.URL.revokeObjectURL(url)
+    })
+    .catch(err => {
+      console.log(err)
+    })
+}

@@ -15,7 +15,7 @@ const routes = [
   {
     name: 'index',
     path: '/',
-    component: () => import('@/views/Map'),
+    component: () => import('@/views/map'),
     meta: {
       needLogin: true
     }

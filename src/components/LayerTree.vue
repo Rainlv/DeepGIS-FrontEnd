@@ -2,8 +2,8 @@
   <div>
     <contextmenu ref="contextmenuAssert">
       <contextmenu-item @click="handleShowLayer">添加至图层</contextmenu-item>
-      <contextmenu-item>菜单2</contextmenu-item>
-      <contextmenu-item>菜单3</contextmenu-item>
+      <contextmenu-item @click="deleteAsset">删除资源</contextmenu-item>
+      <contextmenu-item @click="downloadAsset">下载资源</contextmenu-item>
       <contextmenu-submenu title="子菜单">
         <contextmenu-item>菜单4</contextmenu-item>
         <contextmenu-item divider></contextmenu-item>
@@ -40,7 +40,7 @@
         <el-button size="small" icon="el-icon-refresh" circle @click="initAssertTree"></el-button>
       </el-col>
     </el-row>
-<!--    TODO: Lazy Load-->
+    <!--    TODO: Lazy Load-->
     <el-tree
       class="filter-tree"
       :data="data"
@@ -68,7 +68,7 @@
     >
       <span class="m-el-tree-node" slot-scope="{ node, data }">
 <!--        TODO 添加点线面图标-->
-<!--        <span><i v-if="node.level !== 1" class="iconfont" :class="getIconClass(data.id)"></i>{{ node.label }}</span>-->
+        <!--        <span><i v-if="node.level !== 1" class="iconfont" :class="getIconClass(data.id)"></i>{{ node.label }}</span>-->
         <span><i v-if="node.level !== 1"></i>{{ node.label }}</span>
         <span v-if="node.level !== 1">
           <el-color-picker size="mini" v-model="data.color" @change="handleColorChange($event, node)"></el-color-picker>
@@ -80,7 +80,7 @@
 </template>
 
 <script>
-import { geoserver_get_user_feature_list } from '@/request/api'
+import { geoserver_delete_asset, geoserver_download_asset, geoserver_get_user_feature_list } from '@/request/api'
 import { mapActions, mapMutations, mapState } from 'vuex'
 import 'v-contextmenu/dist/index.css'
 import {
@@ -136,7 +136,8 @@ export default {
   computed: {
     ...mapState({
       'showLayers': state => state.showLayer.layers,
-      'editingLayer': state => state.editLayer.activeEditLayer
+      'editingLayer': state => state.editLayer.activeEditLayer,
+      'userInfo': state => state.user.userInfo
     })
   },
   methods: {
@@ -146,7 +147,7 @@ export default {
       'addWMSShowLayer'
     ]),
     ...mapActions(['setActiveEditLayer']),
-    showStyleForm(){
+    showStyleForm () {
       let idx = this._getLayerIndexByID(this.contextNode.data.id)
       let activeLayer = this.showLayers[idx].layerObj.mapObject
       this.$refs.styleForm.showStyleForm(activeLayer)
@@ -189,6 +190,7 @@ export default {
       this.$refs.contextmenuLayerTree.hide()
       this.$refs.contextmenuAssert.hide()
     },
+
     // 图层树控制
     _getLayerIndexByID (id) {
       let [typeNS, typeName] = id.split(':', 2)
@@ -238,12 +240,12 @@ export default {
       let activeLayerVComp = this.showLayers[idx].layerObj
       activeLayerVComp.fitBounds()
     },
-    handleBring2Top(){
+    handleBring2Top () {
       let idx = this._getLayerIndexByID(this.contextNode.data.id)
       let activeLayerVComp = this.showLayers[idx].layerObj
       activeLayerVComp.bringToFront()
     },
-    handleBring2Back(){
+    handleBring2Back () {
       let idx = this._getLayerIndexByID(this.contextNode.data.id)
       let activeLayerVComp = this.showLayers[idx].layerObj
       activeLayerVComp.bringToBack()
@@ -309,6 +311,39 @@ export default {
         this.$set(this.data[0], 'children', res.result)
       })
     },
+    deleteAsset () {
+      let {
+        label,
+        id,
+        type
+      } = this.contextNode.data
+      let [typeNS, typeName] = id.split(':', 2)
+      if (!typeNS.startsWith(this.userInfo.nick_name)) {
+        this.$message({
+          type: 'warning',
+          message: '只能删除本用户的私有资源！'
+        })
+      } else {
+        geoserver_delete_asset({
+          layer_name: typeName,
+          layer_type: type
+        }).then(res => {
+          this.$message({
+            type: 'success',
+            message: '删除成功'
+          })
+        })
+      }
+    },
+    downloadAsset () {
+      let {
+        label,
+        id,
+        type
+      } = this.contextNode.data
+      let [typeNS, typeName] = id.split(':', 2)
+      geoserver_download_asset({ feature_name: typeName })
+    }
   },
   mounted () {
     this.initAssertTree()

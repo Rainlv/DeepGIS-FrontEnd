@@ -1,11 +1,11 @@
 <template>
   <el-dialog
-    title="提示"
+    title="样式设置"
     :visible.sync="dialogVisible"
     width="30%"
     :close-on-click-modal="false"
+    append-to-body
     :modal="false"
-    :title="'样式设置'"
     v-dialogDrag
   >
     <el-form ref="form" :model="styleForm" label-width="100px" size="mini">
