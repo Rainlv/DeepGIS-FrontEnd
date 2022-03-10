@@ -14,7 +14,7 @@
           </el-table-column>
           <el-table-column label="字段类型" width="180">
             <template v-slot="scope">
-              <el-select v-if="scope.$index == 0"
+              <el-select v-if="scope.$index === 0"
                          v-model="scope.row.geoType" placeholder="请选择" size="small">
                 <el-option
                   v-for="item in geo_type"

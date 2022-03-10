@@ -1,6 +1,7 @@
 <template>
   <body id="poster">
-  <el-form :model="registerForm" class="login-container" label-position="left" label-width="0px" :rules="rules">
+  <el-form ref="form" :model="registerForm" class="login-container" label-position="left" label-width="0px"
+           :rules="rules">
     <h3 class="login_title">注册</h3>
     <el-form-item prop="nick_name">
       <el-input type="text" v-model="registerForm.nick_name" auto-complete="off" placeholder="请输入昵称"></el-input>
@@ -15,7 +16,7 @@
     </el-form-item>
 
     <el-form-item prop="confirmPwd">
-      <el-input type="password" v-model="registerContext.confirmPwd" auto-complete="off" placeholder="确认密码"
+      <el-input type="password" v-model="registerForm.confirmPwd" auto-complete="off" placeholder="确认密码"
                 @keyup.enter.native="register">
       </el-input>
     </el-form-item>
@@ -76,10 +77,11 @@ export default {
         nick_name: '',
         email: '',
         password: '',
-      },
-      registerContext: {
         confirmPwd: '',
       },
+      // registerContext: {
+      //   confirmPwd: '',
+      // },
       responseResult: [],
       loading: false,
       rules: {
@@ -114,24 +116,39 @@ export default {
   methods: {
     register () {
       if (this.loading) return
-      this.loading = true
-      auth_register(this.registerForm).then(res => {
-        this.loading = false
-        this.$message({
-          message: '注册成功即将跳转至登录页面',
-          type: 'success'
-        })
-        this.timer = setTimeout(() => {
-          this.$router.push('/login')
-        }, 1000)
-      }).catch((err) => {
-        this.loading = false
-        console.log(err)
-        this.$message({
-          message: '注册失败！',
-          type: 'error'
+      this.$refs.form.validate(value => {
+        if (!value) {
+          this.$message({
+            message: '请按规则填写表单信息',
+            type: 'warning'
+          })
+          return
+        }
+        this.loading = true
+        let auth_data = {
+          nick_name: this.registerForm.nick_name,
+          email: this.registerForm.email,
+          password: this.registerForm.password,
+        }
+        auth_register(auth_data).then(res => {
+          this.loading = false
+          this.$message({
+            message: '注册成功即将跳转至登录页面',
+            type: 'success'
+          })
+          this.timer = setTimeout(() => {
+            this.$router.push('/login')
+          }, 1000)
+        }).catch((err) => {
+          this.loading = false
+          console.log(err)
+          this.$message({
+            message: '注册失败！',
+            type: 'error'
+          })
         })
       })
+
     },
     toLogin () {
       this.$router.push('/login')

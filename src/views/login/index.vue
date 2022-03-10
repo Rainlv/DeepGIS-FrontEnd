@@ -1,6 +1,6 @@
 <template>
   <body id="poster">
-  <el-form class="login-container" label-position="left" label-width="0px">
+  <el-form ref="form" class="login-container" label-position="left" label-width="0px" :model="loginForm">
     <h3 class="login_title">登录</h3>
     <el-form-item>
       <el-input type="text" v-model="loginForm.username" auto-complete="off" placeholder="请输入账号"></el-input>
@@ -46,31 +46,40 @@ export default {
     ...mapMutations(['setUserInfo', 'setToken']),
     login () {
       if (this.loading) return
-      this.loading = true
-      auth_login(this.loginForm).then((res) => {
-        this.loading = false
-        this.setToken({
-          access_token: res.access_token,
-          token_type: res.token_type
-        })
-        if (this.$route.query.redirect) {
-          this.$router.push(this.$route.query.redirect)
-        } else {
-          this.$router.push('/')
+      this.$refs.form.validate(value => {
+        if (!value) {
+          this.$message({
+            message: '请按规则填写表单信息',
+            type: 'warning'
+          })
+          return
         }
-      }).catch(() => {
-        this.loading = false
-        this.$message({
-          message: '登录失败！账号或密码错误',
-          type: 'error'
+        this.loading = true
+        auth_login(this.loginForm).then((res) => {
+          this.loading = false
+          this.setToken({
+            access_token: res.access_token,
+            token_type: res.token_type
+          })
+          if (this.$route.query.redirect) {
+            this.$router.push(this.$route.query.redirect)
+          } else {
+            this.$router.push('/')
+          }
+        }).catch(() => {
+          this.loading = false
+          this.$message({
+            message: '登录失败！账号或密码错误',
+            type: 'error'
+          })
+          this.reset()
         })
-        this.reset()
       })
     },
     reset () {
       this.$set(this.loginForm, 'password', '')
     },
-    toRegister(){
+    toRegister () {
       this.$router.push('/register')
     }
   },

@@ -5,11 +5,11 @@
     :close-on-click-modal="false"
     append-to-body
     v-loading="loading">
-    <el-form :model="form" :rules="rules">
+    <el-form :model="form" :rules="rules" ref="form">
       <el-form-item label="矢量图层名称" :label-width="formLabelWidth" prop="layer_name">
         <el-input v-model="form.layer_name" autocomplete="off" placeholder="请输入图层名称"></el-input>
       </el-form-item>
-      <el-form-item label="矢量类型" :label-width="formLabelWidth">
+      <el-form-item label="矢量类型" :label-width="formLabelWidth" prop="geo_type">
         <el-select v-model="form.geo_type" placeholder="请选择矢量类型">
           <el-option label="点" value="POINT"></el-option>
           <el-option label="线" value="LINESTRING"></el-option>
@@ -22,7 +22,8 @@
         v-for="(field, index) in form.fields"
         :label="'字段' + (index+1)"
         :key="field.key"
-        prop="fields"
+        :prop='("fields." + index).toString()'
+        :rules="rules.field"
       >
         <el-col :span="8">
           <el-input v-model="form.fields[index].field_name" autocomplete="off" placeholder="请输入字段名称"></el-input>
@@ -78,10 +79,37 @@ export default {
           validator: validateName,
           trigger: 'blur'
         }],
-        fields: [{
+        geo_type: [{
+          type: 'string',
           required: true,
-          message: "字段名称不能为空",
-          trigger: 'blur'
+          message: '矢量类型不能为空'
+        }, {
+          type: 'enum',
+          enum: ['POINT', 'LINESTRING', 'POLYGON']
+        }],
+        fields: [{
+          type: 'object',
+          required: true,
+          fields: {
+            field_name: [{
+              type: 'string',
+              required: true,
+              message: '字段名称不能为空',
+              trigger: 'blur'
+            }, {
+              max: 10,
+              trigger: 'blur',
+              message: '字段名称长度应小于10',
+            }],
+            field_type: [{
+              type: 'string',
+              required: true,
+              message: '字段类型不能为空'
+            }, {
+              type: 'enum',
+              enum: ['Integer', 'Float', 'String', 'DateTime']
+            }]
+          }
         }],
       }
     }
@@ -91,7 +119,7 @@ export default {
       this.form.fields.push({
         field_name: '',
         key: Date.now(),
-        field_type: ''
+        field_type: 'Integer'
       })
     },
     _reset_form_data () {
@@ -111,17 +139,27 @@ export default {
     },
 
     handleConfirm () {
-      this.loading = true
-      // geoserver_create_table(JSON.parse(JSON.stringify(this.form))).then(res => {
-      geoserver_create_table(this.form).then(res => {
-        this.loading = false
-        this.$alert('创建图层成功!', '执行成功', { showCancelButton: false }).then(() => {
-          this._close_dialog()
+      if (this.loading) return
+      this.$refs.form.validate(value => {
+        if (!value) {
+          this.$message({
+            message: '请先完善表单',
+            type: 'warning'
+          })
+          return
+        }
+        this.loading = true
+        geoserver_create_table(this.form).then(res => {
+          this.loading = false
+          this.$alert('创建图层成功!', '执行成功', { showCancelButton: false }).then(() => {
+            this._close_dialog()
+          })
+        }).catch(res => {
+          this.loading = false
+          this.$alert(`创建图层失败!${res}`, '执行失败', { showCancelButton: false })
         })
-      }).catch(res => {
-        this.loading = false
-        this.$alert(`创建图层失败!${res.message}`, '执行失败', { showCancelButton: false })
       })
+
     },
     removeField (key) {
       this.form.fields.forEach(function (item, index, arr) {
