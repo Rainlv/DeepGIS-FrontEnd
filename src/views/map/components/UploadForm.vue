@@ -91,7 +91,7 @@ export default {
       this.$refs.uploader.submit()
     },
     handleCancel () {
-
+      this.dialogFormVisible = false
     },
     handleUploadError () {
 

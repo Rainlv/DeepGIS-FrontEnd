@@ -26,7 +26,7 @@
 </template>
 
 <script>
-import { auth_login, user_info } from '@/request/api'
+import { auth_login } from '@/request/api'
 import { mapMutations } from 'vuex'
 
 export default {
