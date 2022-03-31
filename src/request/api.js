@@ -14,6 +14,11 @@ export const auth_login = p => post('/auth/jwt/login', p, false)
 export const auth_register = p => post('/auth/register', p, true)
 export const user_info = () => get('users/me', null)
 
+// Coder
+export const get_coder_url = p => get('/api/coder/get_container', p)
+
+
+
 // Geoserver请求
 // ------------------
 const wfsDefaultParam = {

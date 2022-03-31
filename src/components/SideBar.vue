@@ -22,7 +22,8 @@
           <div class="leaflet-sidebar-close"><i class="fa fa-caret-left"></i></div>
         </h1>
         <div style="margin-top: 20px">
-          <feature-props></feature-props>
+          <feature-props v-if="clickFeature"></feature-props>
+          <el-empty v-else description="无选中要素"></el-empty>
         </div>
       </div>
       <div class="leaflet-sidebar-pane" id="layerTree">

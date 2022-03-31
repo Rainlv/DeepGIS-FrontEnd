@@ -70,9 +70,9 @@
 <!--        TODO 添加点线面图标-->
         <!--        <span><i v-if="node.level !== 1" class="iconfont" :class="getIconClass(data.id)"></i>{{ node.label }}</span>-->
         <span><i v-if="node.level !== 1"></i>{{ node.label }}</span>
-        <span v-if="node.level !== 1">
-          <el-color-picker size="mini" v-model="data.color" @change="handleColorChange($event, node)"></el-color-picker>
-        </span>
+<!--        <span v-if="node.level !== 1">-->
+<!--          <el-color-picker size="mini" v-model="data.color" @change="handleColorChange($event, node)"></el-color-picker>-->
+<!--        </span>-->
       </span>
     </el-tree>
     <layer-style-form ref="styleForm"></layer-style-form>
@@ -200,11 +200,11 @@ export default {
         }
       }
     },
-    handleColorChange (color, node) {
-      let nodeData = node.data
-      let idx = this._getLayerIndexByID(nodeData.id)
-      this.showLayers[idx].layerObj.fillColor = nodeData.color
-    },
+    // handleColorChange (color, node) {
+    //   let nodeData = node.data
+    //   let idx = this._getLayerIndexByID(nodeData.id)
+    //   this.showLayers[idx].layerObj.fillColor = nodeData.color
+    // },
     checkChange (nodeData, treeStatus) {
       let idx = this._getLayerIndexByID(nodeData.id)
       if (treeStatus.checkedKeys.indexOf(nodeData.id) !== -1) {

@@ -5,7 +5,6 @@
 <script>
 import { LTileLayer } from 'vue2-leaflet'
 import 'leaflet.chinatmsproviders'
-import { TianDiMapApi } from '@/config'
 
 const props = {
   type: {
@@ -15,7 +14,7 @@ const props = {
   options: {
     type: Object,
     default () {
-      return { key: TianDiMapApi }
+      return { key: '' }
     },
   },
 }

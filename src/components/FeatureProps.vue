@@ -20,7 +20,7 @@ import { editLayer } from '@/store/modules/map'
 export default {
   name: 'FeatureProps',
   data () {
-    return { labelWidth: 'auto' }
+    return { labelWidth: '100px' }
   },
   props: {
     disabled: Boolean

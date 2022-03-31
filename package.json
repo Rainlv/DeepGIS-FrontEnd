@@ -24,7 +24,6 @@
     "leaflet.chinatmsproviders": "^3.0.4",
     "leaflet.coordinates": "^0.1.5",
     "leaflet.markercluster": "^1.5.3",
-    "node-sass": "^4.14.1",
     "qs": "^6.10.3",
     "v-contextmenu": "^2.9.0",
     "vue": "^2.6.11",

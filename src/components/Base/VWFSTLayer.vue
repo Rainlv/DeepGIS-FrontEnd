@@ -72,9 +72,9 @@ export default {
       this._map = this.parentContainer.mapObject
       this.mapObject = new L.WFST({ ...defaultOptions, ...this.options })
       const allowDrawType = {
-        Point: ['Marker', 'CircleMarker'],
-        Line: ['Line'],
-        Polygon: ['Rectangle', 'Polygon', 'Circle']
+        Point: ['Marker', 'CircleMarker', "Cut"],
+        Line: ['Line', "Cut"],
+        Polygon: ['Rectangle', 'Polygon', 'Circle', "Cut"]
       }
 
       // 编辑时控制可编辑形状
@@ -166,6 +166,7 @@ export default {
     },
     // 反转颜色
     reverseColor (oldColor) {
+      if (!oldColor) return
       oldColor = '0x' + oldColor.replace(/#/g, '')
       let str = '000000' + (0xFFFFFF - oldColor).toString(16)
       return '#' + str.substring(str.length - 6, str.length)

@@ -38,7 +38,8 @@
       >
       </WFSLayer>
       <!--      <v-maker-cluster></v-maker-cluster>-->
-      <v-easy-button :options="b_options" @click="click"></v-easy-button>
+      <v-easy-button :options="save_btn_options" @click="handleSaveClick"></v-easy-button>
+      <v-easy-button :options="coder_btn_options" @click="handleCoderClick"></v-easy-button>
       <VWMSLayer
         v-for="wmsLayer in wmsLayers"
         :key="wmsLayer.layerName"
@@ -69,6 +70,7 @@ import { editLayer, globalMapObj, showLayer, showWMSLayer } from '@/store/module
 import { mapMutations, mapState } from 'vuex'
 import VMakerCluster from '@/components/Base/VMakerCluster'
 import UploadLayerBtn from '@/views/map/components/UploadLayerBtn'
+import { get_coder_url } from '@/request/api'
 
 export default {
   components: {
@@ -113,13 +115,22 @@ export default {
           visible: false,
           url: 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',
         }],
-      b_options: {
+      save_btn_options: {
         position: 'topright',
         states: [{
           stateName: '',
           icon: 'fa-floppy-o fa-lg',
           title: '保存图层',
-          onClick: this.click
+          onClick: this.handleSaveClick
+        }]
+      },
+      coder_btn_options:{
+        position: 'topright',
+        states: [{
+          stateName: '',
+          icon: 'fa-code fa-lg',
+          title: '打开编辑器',
+          onClick: this.handleCoderClick
         }]
       }
     }
@@ -143,7 +154,7 @@ export default {
     boundsUpdated (bounds) {
       this.bounds = bounds
     },
-    click () {
+    handleSaveClick () {
       if (this.activeEditLayer) {
         this.activeEditLayer.save()
       } else {
@@ -152,6 +163,18 @@ export default {
           type: 'warning'
         })
       }
+    },
+    handleCoderClick(){
+      get_coder_url().then(res=>{
+        let url = res.result[0]['url']
+        window.open(url, '_blank');
+      }).catch(err=>{
+        console.log(err)
+        this.$message({
+          message: '获取Coder URL失败！',
+          type: 'error'
+        })
+      })
     },
     warnNoDrawingLayer (e) {
       if (!this.activeEditLayer) {

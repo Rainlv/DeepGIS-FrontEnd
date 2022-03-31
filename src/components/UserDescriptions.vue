@@ -20,11 +20,6 @@ import { user_info } from '@/request/api'
 
 export default {
   name: 'UserDescriptions',
-  // computed: {
-  //   ...mapState({
-  //     userInfo: state => state.user.userInfo
-  //   })
-  // },
   data () {
     return {
       userInfo: {}
@@ -35,7 +30,8 @@ export default {
     logout () {
       this.removeToken()
       // TODO 为硬编码，需要优化
-      window.location.href = '/#/login'
+      this.$router.go(0)
+      this.$router.push('/login')
     }
   },
   created () {
