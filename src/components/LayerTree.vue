@@ -70,9 +70,9 @@
 <!--        TODO 添加点线面图标-->
         <!--        <span><i v-if="node.level !== 1" class="iconfont" :class="getIconClass(data.id)"></i>{{ node.label }}</span>-->
         <span><i v-if="node.level !== 1"></i>{{ node.label }}</span>
-<!--        <span v-if="node.level !== 1">-->
-<!--          <el-color-picker size="mini" v-model="data.color" @change="handleColorChange($event, node)"></el-color-picker>-->
-<!--        </span>-->
+        <!--        <span v-if="node.level !== 1">-->
+        <!--          <el-color-picker size="mini" v-model="data.color" @change="handleColorChange($event, node)"></el-color-picker>-->
+        <!--        </span>-->
       </span>
     </el-tree>
     <layer-style-form ref="styleForm"></layer-style-form>
@@ -80,7 +80,12 @@
 </template>
 
 <script>
-import { geoserver_delete_asset, geoserver_download_asset, geoserver_get_user_feature_list } from '@/request/api'
+import {
+  geoserver_delete_asset,
+  geoserver_download_feature_asset,
+  geoserver_download_raster_asset,
+  geoserver_get_user_feature_list
+} from '@/request/api'
 import { mapActions, mapMutations, mapState } from 'vuex'
 import 'v-contextmenu/dist/index.css'
 import {
@@ -342,7 +347,11 @@ export default {
         type
       } = this.contextNode.data
       let [typeNS, typeName] = id.split(':', 2)
-      geoserver_download_asset({ feature_name: typeName })
+      if (type === 'feature') {
+        geoserver_download_feature_asset({ feature_name: typeName })
+      } else if (type === 'raster') {
+        geoserver_download_raster_asset(id)
+      }
     }
   },
   mounted () {

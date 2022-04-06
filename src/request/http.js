@@ -159,7 +159,7 @@ export function del (url, params, config = {}) {
   })
 }
 
-export function download (url, params, config) {
+export function download (url, params, config, fileType) {
   axios_instance.get(url, {
     params: params,
     responseType: 'blob',
@@ -173,7 +173,13 @@ export function download (url, params, config) {
       } = res
       // let timestamp = new Date().getTime()
       // const fileName = `${timestamp}.geojson`
-      const fileName = headers['content-disposition'].replace(/\w+;filename=(.*)/, '$1')
+      let fileName = null
+      if (headers['content-disposition']){
+        fileName = headers['content-disposition'].replace(/\w+;filename=(.*)/, '$1')
+      }else {
+        let timestamp = new Date().getTime()
+        fileName = `${timestamp}.${fileType}`
+      }
 
       const blob = new Blob([data], { type: headers['content-type'] })
       // const blob = new Blob([data])

@@ -11,15 +11,6 @@
           <el-option label="栅格" :value="GeoDataType.RASTER"></el-option>
         </el-select>
       </el-form-item>
-      <!--      <el-form-item label="文件类型">-->
-      <!--        <el-select v-model="formData.region" placeholder="活动区域">-->
-      <!--          <el-option label="区域一" value="shanghai"></el-option>-->
-      <!--          <el-option label="区域二" value="beijing"></el-option>-->
-      <!--        </el-select>-->
-      <!--      </el-form-item>-->
-      <!--      <el-form-item>-->
-      <!--        <el-button type="primary" @handleSaveClick="submitAndUpload">查询</el-button>-->
-      <!--      </el-form-item>-->
     </el-form>
     <div slot="footer" class="dialog-footer">
       <el-button @click="handleCancel">取 消</el-button>
@@ -93,11 +84,7 @@ export default {
     handleCancel () {
       this.dialogFormVisible = false
     },
-    handleUploadError () {
-
-    },
     onBeforeUpload (file) {
-      console.log(file)
     },
 
   }
