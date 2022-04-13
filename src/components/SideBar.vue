@@ -9,6 +9,7 @@
       </ul>
 
       <ul role="tablist"> <!-- bottom aligned tabs -->
+        <li><a href="#taskList" role="tab"><i class="fa fa-list-ol"></i></a></li>
         <li><a href="#profile" role="tab"><i class="fa fa-user"></i></a></li>
         <li><a href="#settings" role="tab"><i class="fa fa-gear"></i></a></li>
       </ul>
@@ -43,6 +44,15 @@
           <el-empty v-else description="无选中要素"></el-empty>
         </div>
       </div>
+      <div class="leaflet-sidebar-pane" id="taskList">
+        <h1 class="leaflet-sidebar-header">任务列表
+          <div class="leaflet-sidebar-close"><i class="fa fa-caret-left"></i></div>
+        </h1>
+        <div style="margin-top: 10px">
+          <task-list v-if="queue.length!==0"></task-list>
+          <el-empty v-else description="当前无任务"></el-empty>
+        </div>
+      </div>
       <div class="leaflet-sidebar-pane" id="profile">
         <h1 class="leaflet-sidebar-header">个人信息
           <div class="leaflet-sidebar-close"><i class="fa fa-caret-left"></i></div>
@@ -69,7 +79,8 @@ import { mapMutations, mapState } from 'vuex'
 import LayerTree from '@/components/LayerTree'
 import UserDescriptions from '@/components/UserDescriptions'
 import StyleForm from '@/components/StyleForm'
-import { editLayer } from '@/store/modules/map'
+import TaskList from '@/components/TaskList'
+import { downloadQueue } from '@/store/modules/queue'
 
 export default {
   name: 'SideBar',
@@ -77,7 +88,8 @@ export default {
     StyleForm,
     FeatureProps,
     LayerTree,
-    UserDescriptions
+    UserDescriptions,
+    TaskList
   },
   mounted () {
     this.mapObject = L.control.sidebar({
@@ -99,6 +111,7 @@ export default {
     ...mapState({
       clickFeature: state => state.editLayer.clickFeatureElm,
       clickLayer: state => state.editLayer.clickFeatureLayer,
+      queue: state => state.downloadQueue.queue
     })
   }
 }

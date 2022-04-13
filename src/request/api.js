@@ -17,12 +17,16 @@ const wcsDefaultParam = {
 export const geoserver_create_table = p => post('/api/geoserver/create_table', p)
 export const geoserver_get_user_feature_list = p => get('/api/geoserver/get_user_features', p)
 export const geoserver_delete_asset = p => del('/api/geoserver/delete_asset', p)
-export const geoserver_download_feature_asset = p => download('/api/geoserver/download_features', p)
-export const geoserver_download_raster_asset = layerName => download(baseGeoserverUrl,
+export const geoserver_download_feature_asset = (layerName, ...args) => download(baseGeoserverUrl,
+  {
+    REQUEST: 'GetFeature', ...wfsDefaultParam,
+    TYPENAME: layerName
+  }, {}, 'geojson', ...args)
+export const geoserver_download_raster_asset = (layerName, ...args) => download(baseGeoserverUrl,
   {
     REQUEST: 'GetCoverage', ...wcsDefaultParam,
     coverageId: layerName,
-  }, {}, 'tif'
+  }, {}, 'tif', ...args
 )
 
 // 用户

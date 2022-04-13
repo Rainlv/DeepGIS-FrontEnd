@@ -96,6 +96,7 @@ import {
   ContextmenuGroup,
 } from 'v-contextmenu/src'
 import LayerStyleForm from '@/components/LayerStyleForm'
+import { downloadStatus, GeoDataType } from '@/utils/constant'
 
 export default {
   name: 'LayerTree',
@@ -142,20 +143,130 @@ export default {
     ...mapState({
       'showLayers': state => state.showLayer.layers,
       'editingLayer': state => state.editLayer.activeEditLayer,
-      'userInfo': state => state.user.userInfo
+      'userInfo': state => state.user.userInfo,
+      'queue': state => state.downloadQueue.queue,
     })
   },
   methods: {
     ...mapMutations([
       'addShowLayer',
       'removeLayer',
-      'addWMSShowLayer'
+      'addWMSShowLayer',
+      'addQueue',
+      'updateQueue',
     ]),
     ...mapActions(['setActiveEditLayer']),
     showStyleForm () {
       let idx = this._getLayerIndexByID(this.contextNode.data.id)
       let activeLayer = this.showLayers[idx].layerObj.mapObject
       this.$refs.styleForm.showStyleForm(activeLayer)
+    },
+
+    downloadFile (assetType, assetId) {
+      let func = null
+      if (assetType === GeoDataType.FEATURE) {
+        func = geoserver_download_feature_asset
+        func(assetId, processEvt => {
+            this.updateQueue({
+              id: assetId,
+              status: downloadStatus.DOWNLOADING,
+              process: processEvt.loaded / 1e3
+            })
+          }, () => {
+            const queueItem = this.queue.find(item => item.id === assetId)
+            if (queueItem) {
+              // 如果下载过
+              if (queueItem.status !== downloadStatus.DOWNLOADING) {
+                // 如果下载完成，则重新添加到下载队列
+                this.updateQueue({
+                  id: assetId,
+                  status: downloadStatus.DOWNLOADING,
+                  process: 0
+                })
+                this.$message({
+                  type: 'info',
+                  message: assetId + '正在导出...'
+                })
+                return true
+              }
+              // 如果下载中，则阻止重复添加
+              this.$message.warning('正在导出中，请勿重复导出！')
+              return false
+            }
+            this.$message({
+              type: 'info',
+              message: assetId + '正在导出...'
+            })
+            this.addQueue({
+              id: assetId,
+              status: downloadStatus.DOWNLOADING,
+              process: 0
+            })
+            return true
+          }, () => {
+            this.updateQueue({
+              id: assetId,
+              status: downloadStatus.DOWNLOADED,
+            })
+          }
+          , (err) => {
+            this.$message({
+              type: 'error',
+              message: assetId + '下载失败！' + err
+            })
+          })
+      } else if (assetType === GeoDataType.RASTER) {
+        func = geoserver_download_raster_asset
+        func(assetId, processEvt => {
+            this.updateQueue({
+              id: assetId,
+              status: downloadStatus.DOWNLOADING,
+              process: processEvt.loaded / 1e3
+            })
+          }, () => {
+            const queueItem = this.queue.find(item => item.id === assetId)
+            if (queueItem) {
+              // 如果下载过
+              if (queueItem.status !== downloadStatus.DOWNLOADING) {
+                // 如果下载完成，则重新添加到下载队列
+                this.updateQueue({
+                  id: assetId,
+                  status: downloadStatus.DOWNLOADING,
+                  process: 0
+                })
+                this.$message({
+                  type: 'info',
+                  message: assetId + '正在导出...'
+                })
+                return true
+              }
+              // 如果下载中，则阻止重复添加
+              this.$message.warning('正在导出中，请勿重复导出！')
+              return false
+            }
+            this.$message({
+              type: 'info',
+              message: assetId + '正在导出...'
+            })
+            this.addQueue({
+              id: assetId,
+              status: downloadStatus.DOWNLOADING,
+              process: 0
+            })
+            return true
+          }, () => {
+            this.updateQueue({
+              id: assetId,
+              status: downloadStatus.DOWNLOADED,
+            })
+          }
+          , (err) => {
+            this.$message({
+              type: 'error',
+              message: assetId + '下载失败！' + err
+            })
+          })
+      }
     },
     // 右键菜单
     filterNode (value, data) {
@@ -346,12 +457,7 @@ export default {
         id,
         type
       } = this.contextNode.data
-      let [typeNS, typeName] = id.split(':', 2)
-      if (type === 'feature') {
-        geoserver_download_feature_asset({ feature_name: typeName })
-      } else if (type === 'raster') {
-        geoserver_download_raster_asset(id)
-      }
+      this.downloadFile(type, id)
     }
   },
   mounted () {

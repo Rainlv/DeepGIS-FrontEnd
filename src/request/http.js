@@ -159,11 +159,26 @@ export function del (url, params, config = {}) {
   })
 }
 
-export function download (url, params, config, fileType) {
+/**
+ * 文件下载请求
+ * @param url {String}
+ * @param params {Object}
+ * @param config {Object}
+ * @param fileType {String}
+ * @param onDownloadProgressFunc {Function}
+ * @param onStart {Function}
+ * @param onSuccess {Function}
+ * @param onErr {Function}
+ */
+export function download (url, params, config, fileType, onDownloadProgressFunc, onStart, onSuccess, onErr) {
+  let res = onStart && onStart()
+  if (onStart && !res) return
   axios_instance.get(url, {
     params: params,
     responseType: 'blob',
     timeout: 30000,
+    onDownloadProgress: onDownloadProgressFunc || (() => {
+    }),
     ...config
   })
     .then(res => {
@@ -171,18 +186,14 @@ export function download (url, params, config, fileType) {
         data,
         headers
       } = res
-      // let timestamp = new Date().getTime()
-      // const fileName = `${timestamp}.geojson`
       let fileName = null
-      if (headers['content-disposition']){
+      if (headers['content-disposition']) {
         fileName = headers['content-disposition'].replace(/\w+;filename=(.*)/, '$1')
-      }else {
+      } else {
         let timestamp = new Date().getTime()
         fileName = `${timestamp}.${fileType}`
       }
-
       const blob = new Blob([data], { type: headers['content-type'] })
-      // const blob = new Blob([data])
       let dom = document.createElement('a')
       let url = window.URL.createObjectURL(blob)
       dom.href = url
@@ -192,8 +203,10 @@ export function download (url, params, config, fileType) {
       dom.click()
       dom.parentNode.removeChild(dom)
       window.URL.revokeObjectURL(url)
+      onSuccess && onSuccess(fileName)
     })
     .catch(err => {
+      onErr && onErr(err)
       console.log(err)
     })
 }
