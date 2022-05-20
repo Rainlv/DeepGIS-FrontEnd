@@ -6,9 +6,11 @@ export default {
   name: 'MiniMap',
   props: {
     layer: {
-      type:Object,
+      type: Object,
       default () {
-        return new L.TileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png')
+        return new L.TileLayer('http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
+          subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
+        })
       }
     },
     options: {
@@ -18,7 +20,7 @@ export default {
           position: 'bottomright',
           width: 200,
           height: 175,
-          autoToggleDisplay:true,
+          autoToggleDisplay: true,
         }
       },
     }

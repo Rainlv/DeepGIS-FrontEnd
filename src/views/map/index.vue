@@ -20,6 +20,7 @@
         :visible="tileProvider.visible"
         :url="tileProvider.url"
         :attribution="tileProvider.attribution"
+        :options="tileProvider.options"
         layer-type="base"/>
 
       <v-l-fullscreen position="topleft"></v-l-fullscreen>
@@ -107,14 +108,23 @@ export default {
       tileProviders: [
         {
           name: 'OpenStreetMap',
-          visible: true,
+          visible: false,
           url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
         },
         {
           name: 'OpenTopoMap',
           visible: false,
           url: 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',
-        }],
+        },
+        {
+          name: 'SatelliteMap',
+          visible: true,
+          url: 'http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',
+          options: {
+            subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
+          }
+        },
+      ],
       save_btn_options: {
         position: 'topright',
         states: [{
@@ -124,7 +134,7 @@ export default {
           onClick: this.handleSaveClick
         }]
       },
-      coder_btn_options:{
+      coder_btn_options: {
         position: 'topright',
         states: [{
           stateName: '',
@@ -164,11 +174,11 @@ export default {
         })
       }
     },
-    handleCoderClick(){
-      get_coder_url().then(res=>{
+    handleCoderClick () {
+      get_coder_url().then(res => {
         let url = res.result[0]['url']
-        window.open(url, '_blank');
-      }).catch(err=>{
+        window.open(url, '_blank')
+      }).catch(err => {
         console.log(err)
         this.$message({
           message: '获取Coder URL失败！',
@@ -201,10 +211,11 @@ export default {
     this.$refs.map.mapObject.on('pm:globalrotatemodetoggled', this.warnNoEditingLayer)
     this.$refs.map.mapObject.on('pm:globaleditmodetoggled', this.warnNoEditingLayer)
     this.$refs.map.mapObject.on('pm:drawstart', this.warnNoDrawingLayer)
-    // TODO　添加MarkerCluster
-    // this.$refs.map.mapObject.on('pm:create', (e) => {
-    //   e.shape === "Marker" && this.makerClusterObj.addLayer(e.layer)
+
+    // const satelliteMap = L.tileLayer('http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
+    //   subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
     // })
+    // satelliteMap.addTo(this.$refs.map.mapObject)
   }
 }
 </script>

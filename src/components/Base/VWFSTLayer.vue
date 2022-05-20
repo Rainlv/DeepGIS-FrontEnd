@@ -225,10 +225,14 @@ export default {
           })
         }
         let props = e.layer.feature.properties
+        delete props['boundedBy']  // 删除边界属性
         // 没有属性的要素(新添加的未赋值要素)用图层字段来赋空值
-        if (Object.keys(props).length === 0) {
+        if (Object.keys(props).length !== Object.keys(e.target.readFormat.featureType.fieldTypes).length) {
           for (let key in e.target.readFormat.featureType.fieldTypes) {
-            props[key] = null
+            // 如果属性中没有该字段，则赋空值
+            if (!(key in props) && key !== 'boundedBy') {
+              props[key] = null
+            }
           }
         }
         this.setClickFeatureInfo({
